@@ -6,6 +6,8 @@
 
 #include "lib/hclib.h"
 
+static void print_usage();
+
 int main(int argc, char *argv[])
 {
 
@@ -15,7 +17,12 @@ int main(int argc, char *argv[])
     {
         graph_file = argv[1];
         tour_file = argv[2];
+    } else
+    {
+        print_usage();
+        return 1;
     }
+
 
     int **graph;
     int node_count;
@@ -37,4 +44,13 @@ int main(int argc, char *argv[])
     free_tour(tour);
 
     return 0;
+}
+
+static void print_usage()
+{
+    printf("Checks if tour is a valid Hamiltonian Cycle for a gprah\n\n");
+
+    printf("Usage:\n");
+    printf("hc_check graphfile.hcp tourfile.tour\n");
+    
 }
