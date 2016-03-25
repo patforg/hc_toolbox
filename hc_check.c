@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 
-#include "lib/hclib.h"
+#include "hclib.h"
 
 static void print_usage();
 
