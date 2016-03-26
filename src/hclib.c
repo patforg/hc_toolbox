@@ -203,14 +203,7 @@ int* read_tour(char* file, int *node_count)
 
 void free_tour(int *tour)
 {
-
-    if (tour == NULL)
-    {
-        return;
-    } 
-
     free(tour);
-
 }
 
 bool hc_validate(int* tour, int tour_node_count, int** graph, int node_count, bool verbose)
