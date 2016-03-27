@@ -28,7 +28,7 @@ bool backtrack(int** graph, int* node_count, int* edge_count, int* path)
 
         while (i <= *node_count) {
             // is there an edege from previous node to ith node
-            // and ith node was not visited already use it
+            // and ith node was not visited already, use it
             if (graph[ path[pos-1] ][i] == 1 &&
                 visited_nodes[i] == 0) {
                 path[pos] = i;
@@ -42,32 +42,23 @@ bool backtrack(int** graph, int* node_count, int* edge_count, int* path)
 
         }
 
-        // check if we checked all nodes
-        // if no suitable paths were found
-        // current node is a dead end
-        if (i > *node_count && pos < *node_count) {
-            // check if we have other nodes
-            // to try for current position
-            if (path[pos] > 0 && 
-                    path[pos] < *node_count) 
-            {
-                visited_nodes[path[pos]] = 0;
-                i = path[pos]+1;
-            } else  // backtrack
-            {
+        // if we haven't constructed a path
+        // with the number of nodes we backtrack
+        // or if we have a path proper lengh but
+        // it doesn't complete the cycle
+        if (pos < *node_count ||
+            graph[ path[pos-1] ][1] == 0) {
 
-                //printf("Backtracking from pos %i\n", pos);
 
-                visited_nodes[path[pos]] = 0;
-                path[pos] = 0; // clear current value
+            //printf("Backtracking from pos %i\n", pos);
 
-                // go back by one position
-                pos--;
-                i = path[pos]+1; // continue at next node
+            // go back by one position
+            pos--;
+            i = path[pos]+1; // continue search at next node
 
-                visited_nodes[path[pos]] = 0;
-                path[pos] = 0; // clear current path value
-            }
+            // clear current path removed flag that node was visited
+            visited_nodes[path[pos]] = 0;
+            path[pos] = 0;
 
         }
     }
