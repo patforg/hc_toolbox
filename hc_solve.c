@@ -27,34 +27,42 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-
     int **graph;
     int node_count;
     int edge_count;
-    int* solution;
+    bool found_solution = false;
+    int* path;
     int i;
     graph = read_graph(graph_file, &node_count, &edge_count);
 
     printf("Graph has %d nodes and %d edges\n", node_count, edge_count);
+    path = malloc( node_count * sizeof(int*));
 
     if (strcmp("backtrack", solver) == 0) {
-        solution = backtrack(graph, &node_count, &edge_count);
+        found_solution = backtrack(graph, &node_count, &edge_count, path);
     } else {
         printf("Unknown solver: %s", solver);
     }
 
-    if (solution) {
+    if (found_solution) {
         printf("Suggested path:");
-        for (i = 1; i <= node_count; i++) {
-            if (solution[i] > 0) {
-                printf("%i", solution[i]);
+        for (i = 0; i < node_count; i++) {
+            if (path[i] > 0) {
+                if (i > 0) {
+                    printf("-");
+                } //if
+                printf("%i", path[i]);
             } //if
         } //for
         printf("\n");
 
-        free(solution);
+        hc_validate(path, node_count, graph, node_count, true); 
+    } else
+    {
+        printf("No solution could be found \n");
     } //if
     
+    free(path);
     free_graph(graph, &node_count);
 
     return 0;
