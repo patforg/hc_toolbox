@@ -229,8 +229,8 @@ bool hc_validate(int* tour, int tour_node_count, int** graph, int node_count, bo
 
     /* track which nodes have been visited */
     int* visited_nodes;
-    visited_nodes = malloc( node_count * sizeof(int*));
-    for (int i = 0; i < node_count; i++) 
+    visited_nodes = malloc( (node_count+1) * sizeof(int*));
+    for (int i = 0; i <= node_count; i++) 
     {
         visited_nodes[i] = 0;
     }
@@ -275,7 +275,7 @@ bool hc_validate(int* tour, int tour_node_count, int** graph, int node_count, bo
     if (valid && visited_node_count != node_count)
     {
         if (verbose)
-            printf("Not all nodes visited\n");
+            printf("Not all nodes visited (visited %i, expected %i)\n", visited_node_count, node_count);
 
         valid = false;
     }
