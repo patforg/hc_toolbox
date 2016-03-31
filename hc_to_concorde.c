@@ -47,10 +47,10 @@ int main(int argc, char *argv[])
 
     for (i = 1; i <= node_count; i++) {
         for (j = 1; j <= node_count; j++) {
-                fprintf(fp,"%i", (graph[i][j] ? 0 : 1) );
-            if (i > 1) {
+            if (j > 1) {
                 fprintf(fp," ");
             } //if
+            fprintf(fp,"%i", (graph[i][j] ? 0 : 1) );
         }
         fputs("\n",fp);
     }
