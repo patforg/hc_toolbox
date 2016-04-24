@@ -181,7 +181,7 @@ int* read_tour(char* file, int *node_count)
                     current_pos++;
                 } else 
                 {
-                    fprintf(stderr, "Node %d is out of range", node);
+                    fprintf(stderr, "Node %d is out of range\n", node);
                 }
 
                 // get next node on same line
@@ -251,7 +251,7 @@ bool hc_validate(int* tour, int tour_node_count, int** graph, int node_count, bo
             if (graph[previous_node][current_node] == 0) 
             {
                 if (verbose)
-                    printf("No edge between %d and %d", previous_node, current_node);
+                    printf("No edge between %d and %d\n", previous_node, current_node);
 
                 valid = false;
                 break;
@@ -289,7 +289,7 @@ bool hc_validate(int* tour, int tour_node_count, int** graph, int node_count, bo
         if (graph[firstNode][lastNode] == 0) 
         {
             if (verbose)
-                printf("First node does not connect with last node of tour");
+                printf("First node does not connect with last node of tour\n");
 
             valid = false;
         }
@@ -303,4 +303,13 @@ bool hc_validate(int* tour, int tour_node_count, int** graph, int node_count, bo
     }
     
     return valid;
+}
+
+void print_path(int* path, int* node_count)
+{
+    printf("%i", path[0]);
+    for (int i = 1; i < *node_count; i++) {
+        printf(", %i", path[i]);
+    } //for
+    printf("\n");
 }
