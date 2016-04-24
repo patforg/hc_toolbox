@@ -28,3 +28,8 @@ void free_tour(int* tour);
  * is a hamiltonian cycle for provided graph (adjacency matrix)
  */
 bool hc_validate(int* tour, int tour_node_count, int** graph, int node_count, bool verbose);
+
+/**
+ * prints path seperated by commas
+ */
+void print_path(int* path, int* node_count);
