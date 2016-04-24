@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-std=c99 -Iinclude 
+CFLAGS=-std=c99 -Iinclude  -lm
 DEPS = .h
 
 all: hc_check hc_to_dot hc_to_concorde hc_solve
