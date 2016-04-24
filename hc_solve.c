@@ -9,6 +9,7 @@
 
 #include "hclib.h"
 #include "solvers/backtrack.h"
+#include "solvers/slh.h"
 
 static void print_usage();
 
@@ -45,6 +46,8 @@ int main(int argc, char *argv[])
 
     if (strcmp("backtrack", solver) == 0) {
         found_solution = backtrack(graph, &node_count, &edge_count, path);
+    } else if (strcmp("slh", solver) == 0) {
+        found_solution = slh(graph, &node_count, &edge_count, path);
     } else {
         printf("Unknown solver: %s", solver);
     }
@@ -52,15 +55,7 @@ int main(int argc, char *argv[])
     if (found_solution) {
         // print solution
         printf("Suggested path:");
-        for (i = 0; i < node_count; i++) {
-            if (path[i] > 0) {
-                if (i > 0) {
-                    printf("-");
-                } //if
-                printf("%i", path[i]);
-            } //if
-        } //for
-        printf("\n");
+        print_path(path, &node_count);
 
         // if valid write solution to file
         if (hc_validate(path, node_count, graph, node_count, true) && 
@@ -112,9 +107,10 @@ static void print_usage()
     printf("Try to find Hamiltonian Tours in a graph using a solving algorithm\n\n");
 
     printf("Usage:\n");
-    printf("hc_check [ALG] [GRAPH_FILE] [TOUR_FILE]\n\n");
+    printf("hc_solve [ALG] [GRAPH_FILE] [TOUR_FILE]\n\n");
     printf("    [ALG] Alorithm to use for solving can be one of:\n");
     printf("        backtrack : simple backtracking algorithm\n");
+    printf("        slh : Snakes and ladders heurisitic\n");
     printf("\n");
     printf("    [GRAPH_FILE] HCP graph file\n");
     printf("    [TOUR_FILE] HCP Tour file to write if a solution is found\n\n");
