@@ -13,7 +13,7 @@ hc_to_dot: hc_to_dot.c src/hclib.c
 hc_to_concorde: hc_to_concorde.c src/hclib.c
 	$(CC) -o $@ $^ $(CFLAGS)
 
-hc_solve: hc_solve.c src/hclib.c src/solvers/*.c
+hc_solve: hc_solve.c src/hclib.c src/solvers/*.c src/solvers/slh/*.c
 	$(CC) -o $@ $^ $(CFLAGS)
 
 clean:
