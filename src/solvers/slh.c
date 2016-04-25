@@ -14,6 +14,7 @@ static void stage0();
 static void stage1();
 static void stage2();
 static void stage3();
+static void float2();
 
 static int get_prec_node(int* cur_node);
 static int get_next_node(int* cur_node);
@@ -30,7 +31,7 @@ bool slh(int** graph, int* node_count, int* edge_count, int* path)
     g_graph = graph;
 
     init();
-    stage0();
+    stage1();
 
 
     printf("Final path:");
@@ -226,8 +227,76 @@ void stage0()
 
 }
 
-void stage1() 
+void stage1() {
+		float2();
+		return;
+}
+
+void float2()
 {
+		//I added a not_found flag to stop when a pattern has been found
+		bool not_found = true;
+    for (int i=0; i < *g_node_count && not_found; i++)
+    {
+		//the name of the nodes, not the index --maxime
+        int y = g_path[i];
+        int x = get_next_node(&y);
+
+        // found a gap
+        if (g_graph[y][x] == 1) continue;
+
+		//printf("Found gap between %i and %i\n", cur_node, next_node);
+
+		//start at x exclusively
+		int a = x;
+		while(true) {
+				a = get_next_node(&a);
+				//stop at y exclusively
+				if(a == y) break;
+				//search for a
+				//a can't be next to x and must be connected to x
+				if(get_prec_node(&a) != x && g_graph[a][x] == 1) {
+						int c = get_prec_node(&a);
+						//bd must correspond to either b or d
+						//start at a exclusively
+						int bd = a;
+						while(true){
+								bd = get_next_node(&bd);
+								//stop at y exclusively
+								if(bd == y) break;
+
+								//search for b
+								//can't be befide y because d must be in between
+								if( get_next_node(&bd) != y && g_graph[bd][y] == 1 ) {
+										int b = bd;
+										int d = get_next_node(&b);
+										printf("y = %i, x = %i, a = %i, b = %i, d = %i \n", y, x, a, b, d );
+										swap_nodes(x, c);
+										swap_nodes(d, y);
+										not_found = false;
+										printf("y = %i, x = %i, a = %i, b = %i, d = %i \n", y, x, a, b, d );
+										break;	
+								}
+								//search for d
+								//can't be beside a because b must be inbetween
+								if(get_prec_node(&bd) != a && g_graph[bd][c] == 1 ){
+										int d = bd;
+										int b = get_prec_node(&d);
+										printf("y = %i, x = %i, a = %i, b = %i, d = %i \n", y, x, a, b, d );
+										swap_nodes(x, c);
+										swap_nodes(d, y);
+										not_found = false;
+										printf("y = %i, x = %i, a = %i, b = %i, d = %i \n", y, x, a, b, d );
+										break;	
+								}
+						}
+				}
+		}
+
+
+
+    } //for
+
 
 }
 

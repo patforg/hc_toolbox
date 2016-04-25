@@ -1,0 +1,13 @@
+NAME : test1.hcp
+COMMENT : test for slh floating #1 with a gap between 1 and 2 and all arcs with 2 edges
+TYPE : HCP
+DIMENSION : 6
+EDGE_DATA_FORMAT : EDGE_LIST
+EDGE_DATA_SECTION
+1 5
+4 5
+2 6
+3 6
+2 4
+-1
+EOF
