@@ -1,0 +1,12 @@
+NAME : test1.hcp
+COMMENT : test for slh floating #1 with no gap between 1 and 2
+TYPE : HCP
+DIMENSION : 4
+EDGE_DATA_FORMAT : EDGE_LIST
+EDGE_DATA_SECTION
+1 2
+1 4
+2 3
+2 4
+-1
+EOF
