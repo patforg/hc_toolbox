@@ -47,7 +47,7 @@ bool backtrack(int** graph, int* node_count, int* edge_count, int* path)
         // or if we have a path proper lengh but
         // it doesn't complete the cycle
         if (pos < *node_count ||
-            graph[ path[pos-1] ][1] == 0) {
+            graph[ path[pos-1] ][ path[0] ] == 0) {
 
 
             //printf("Backtracking from pos %i\n", pos);
