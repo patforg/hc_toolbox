@@ -31,6 +31,7 @@ bool slh(int** graph, int* node_count, int* edge_count, int* path)
 
     slhlib_init(node_count,path,graph);
     stage0(graph, node_count, path);
+    stage1(graph, node_count, path);
 
     printf("Final path:");
     print_path(path, node_count);
@@ -153,7 +154,16 @@ void stage1(int** graph, int* node_count, int* path)
     int** ordering_list;
     int min_gap_count = 0;
     int y,x;
+    int found = 0;
     int* gap;
+    int (*flo_functions[5])(int* gap);
+    
+    flo_functions[0] = flo1;
+    flo_functions[1] = flo2;
+    flo_functions[2] = flo3;
+    flo_functions[3] = flo4;
+    flo_functions[4] = flo5;
+    
     gap = malloc( 2 * sizeof(int*));
     
     for (int i=0; i < *node_count; i++)
@@ -165,13 +175,31 @@ void stage1(int** graph, int* node_count, int* path)
         if (graph[y][x] == 0) {
             gap[0] = y;
             gap[1] = x;
+            // TODO:  save g in gap list
 
-            flo1(gap);
-            flo2(gap);
-            flo3(gap);
-            flo4(gap);
-            flo5(gap);
+            // try each flo function until one
+            // can perform a transformation (returns 1)
+            for (int j=0; j < 5; j++) {
+                if ( (*flo_functions[j])(gap) == 1) {
+                    found = 1;
+                    printf("Found transformation in flo%i\n", j);
+                    break;
+                } //if
+            } //for
 
+            // TODO:
+            // 1.1 a) check that new ordering has a new gap not in gap_list (goto 1.2)
+            // 1.1 b) no new gap found revert to prev ordering and try another transformation
+            // 1.1 c) no transformation can be done goto stage 2
+            // 1.2 if transformation reduced number of gaps clear gaps and ordering. If gaps is 0 stop
+            // 1.3 otherwise goto 1.1
+
+            if (found == 1) {
+                // exit loop (for now)
+                // as soon as we found a
+                // valid flo pattern
+                break;
+            }  //if
         } //if
     } //for
 
