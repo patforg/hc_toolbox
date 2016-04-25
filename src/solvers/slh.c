@@ -273,6 +273,7 @@ void float2()
 										printf("y = %i, x = %i, a = %i, b = %i, d = %i \n", y, x, a, b, d );
 										swap_nodes(x, c);
 										swap_nodes(d, y);
+										swap_nodes(c,d);
 										not_found = false;
 										printf("y = %i, x = %i, a = %i, b = %i, d = %i \n", y, x, a, b, d );
 										break;	
@@ -285,6 +286,7 @@ void float2()
 										printf("y = %i, x = %i, a = %i, b = %i, d = %i \n", y, x, a, b, d );
 										swap_nodes(x, c);
 										swap_nodes(d, y);
+										swap_nodes(c,d);
 										not_found = false;
 										printf("y = %i, x = %i, a = %i, b = %i, d = %i \n", y, x, a, b, d );
 										break;	
