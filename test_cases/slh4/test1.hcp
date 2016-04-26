@@ -1,0 +1,15 @@
+NAME : test1.hcp
+COMMENT : test for slh floating #1 with no optional arcs or ladder, but with the ladder (2,7)
+TYPE : HCP
+DIMENSION : 8
+EDGE_DATA_FORMAT : EDGE_LIST
+EDGE_DATA_SECTION
+2 3
+4 5
+6 7
+8 1
+8 4
+1 6
+2 7
+-1
+EOF
