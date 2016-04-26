@@ -248,49 +248,64 @@ void float2()
 
 		//printf("Found gap between %i and %i\n", cur_node, next_node);
 
-		//can't be beside x because c must be in between
-		//int a = get_next_node(&x);
-		int a = get_next_node(&x);
-		while(not_found) {
-				a = ladder_search(a, y, x);
-				if (a == 0) break;
-				int c = get_prec_node(&a);
-						int b = a;
-						//d can't be beside a because b must be in between
-						int d = get_next_node(&a);
-						while(not_found){
-								//b can't be beside y because d must be in between
-								b = ladder_search(b, get_prec_node(&y), y);
-								if (b == 0) break;
-								d = get_next_node(&b);
-								not_found = false;
-						}
-						while(not_found){
-								//can't be beside y because d must be in between
-								d = ladder_search(d, y, c);
-								if (d == 0) break;
-								b = get_prec_node(&d);
-								not_found = false;
-						}
-						if(!not_found){
-								swap_nodes(x, c);
-								swap_nodes(d, y);
-								swap_nodes(c,d);
-								printf("y = %i, x = %i, a = %i, b = %i, c = %i, d = %i \n", y, x, a, b, c, d );
-						}
+		//start at x exclusively
+		int a = x;
+		while(true) {
+				a = get_next_node(&a);
+				//stop at y exclusively
+				if(a == y) break;
+				//search for a
+				//a can't be next to x and must be connected to x
+				if(get_prec_node(&a) != x && g_graph[a][x] == 1) {
+						int c = get_prec_node(&a);
+						//bd must correspond to either b or d
+						//start at a exclusively
+						int bd = a;
+						while(true){
+								bd = get_next_node(&bd);
+								//stop at y exclusively
+								if(bd == y) break;
 
+								//search for b
+								//can't be befide y because d must be in between
+								if( get_next_node(&bd) != y && g_graph[bd][y] == 1 ) {
+										int b = bd;
+										int d = get_next_node(&b);
+										printf("y = %i, x = %i, a = %i, b = %i, d = %i \n", y, x, a, b, d );
+										swap_nodes(x, c);
+										swap_nodes(d, y);
+										swap_nodes(c,d);
+										not_found = false;
+										printf("y = %i, x = %i, a = %i, b = %i, d = %i \n", y, x, a, b, d );
+										break;	
+								}
+								//search for d
+								//can't be beside a because b must be inbetween
+								if(get_prec_node(&bd) != a && g_graph[bd][c] == 1 ){
+										int d = bd;
+										int b = get_prec_node(&d);
+										printf("y = %i, x = %i, a = %i, b = %i, d = %i \n", y, x, a, b, d );
+										swap_nodes(x, c);
+										swap_nodes(d, y);
+										swap_nodes(c,d);
+										not_found = false;
+										printf("y = %i, x = %i, a = %i, b = %i, d = %i \n", y, x, a, b, d );
+										break;	
+								}
 						}
+				}
+		}
 
 
 
-	} //for
+    } //for
 
 
 }
 
 void float5()
 {
-		return;
+		return 0;
 }
 void stage2() 
 {
