@@ -13,6 +13,7 @@ static void stage1();
 static void stage2();
 static void stage3();
 static void float2();
+static void float3();
 static void float5();
 
 static int flo1(int* gap);
@@ -155,7 +156,7 @@ void stage0(int** graph, int* node_count, int* path)
 
 void stage1(int** graph, int* node_count, int* path) 
 {
-		float5();
+		float3();
 		/* commented out for testing
     
     int** gap_list;
@@ -326,6 +327,63 @@ int flo2(int* gap)
     return 0;
 }
 
+void float3()
+{
+		//I added a not_found flag to stop when a pattern has been found
+		bool not_found = true;
+    for (int i=0; i < *g_node_count && not_found; i++)
+    {
+		//the name of the nodes, not the index --maxime
+        int y = g_path[i];
+        int x = get_next_node(&y);
+
+        // found a gap
+        if (g_graph[y][x] == 1) continue;
+
+		//printf("Found gap between %i and %i\n", cur_node, next_node);
+
+		//e and c are temporary for now
+		int e = get_next_node(&x);
+		int c = get_next_node(&e);
+		//d and f are temporary for now
+		int f = get_prec_node(&y);
+		int d = get_prec_node(&f);
+
+		int a = c;
+		while(not_found) {
+
+				//b is temporary for now
+				int b = get_prec_node(&d);
+				a = ladder_search(a, b, x);
+				if (a == 0) break;
+				b = get_next_node(&a);
+				//b must be connected to y
+				if (g_graph[b][y] == 0) continue;
+				//e is temporary for now
+				e = get_next_node(&x);
+				c = e;
+				while(not_found){
+						c = get_next_node(&c);
+						if (c == a) break;
+						e = get_prec_node(&c);
+
+						int d = b;
+						while(not_found){
+								d = ladder_search(d, f, c);
+								if (d == 0) break;
+								f = get_next_node(&d);
+								not_found = false;
+								printf("y = %i, x = %i, e = %i, c = %i, a = %i, b = %i, d = %i, f = %i \n", y, x, e, c, a, b, d, f);
+
+
+						}
+
+				}
+
+		}
+	} //for
+}
+
 int flo3(int* gap)
 {
     return 0;
@@ -352,15 +410,16 @@ void float5()
 
 		//printf("Found gap between %i and %i\n", cur_node, next_node);
 
-		//can't be beside x because c must be in between
-		//int a = get_next_node(&x);
-		int a = get_next_node(&x);
+		//e and c are temporary for now
+		int e = get_next_node(&x);
+		int c = get_next_node(&e);
+		int a = c;
 		while(not_found) {
 				a = ladder_search(a, y, x);
 				if (a == 0) break;
 				int f = get_next_node(&a);
 				//c is temporary for now
-				int c = get_prec_node(&a);
+				c = get_prec_node(&a);
 				int e = x;
 				while(not_found){
 						e = ladder_search(e, c, f);
