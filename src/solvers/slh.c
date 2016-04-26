@@ -328,7 +328,7 @@ int flo2(int* gap)
     return 0;
 }
 
-void float3()
+void float4()
 {
 		//I added a not_found flag to stop when a pattern has been found
 		bool not_found = true;
@@ -374,6 +374,10 @@ void float3()
 								if (d == 0) break;
 								f = get_next_node(&d);
 								not_found = false;
+								swap_nodes(x,e);
+								swap_nodes(c,a);
+								swap_nodes(b,d);
+								swap_nodes(f,y);
 								printf("y = %i, x = %i, e = %i, c = %i, a = %i, b = %i, d = %i, f = %i \n", y, x, e, c, a, b, d, f);
 
 
