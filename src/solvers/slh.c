@@ -157,7 +157,7 @@ void stage0(int** graph, int* node_count, int* path)
 
 void stage1(int** graph, int* node_count, int* path) 
 {
-		float4();
+		float5();
 		/* commented out for testing
     
     int** gap_list;
@@ -507,6 +507,13 @@ void float5()
 										g = get_prec_node(&b);
 										not_found = false;
 										printf("y = %i, x = %i, e = %i, c = %i, a = %i, f = %i, g = %i, b = %i, j = %i, d = %i, h = %i \n", y, x, e, c, a, f, g, b, j, d, h);
+										switch_nodes(c,a,f,g);
+										switch_nodes(x,e,f,g);
+										swap_nodes(x,e);
+										swap_nodes(c,a);
+										swap_nodes(f,g);
+										swap_nodes(b,d);
+										swap_nodes(h,y);
 
 
 								}
