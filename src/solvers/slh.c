@@ -14,6 +14,7 @@ static void stage2();
 static void stage3();
 static void float2();
 static void float3();
+static void float4();
 static void float5();
 
 static int flo1(int* gap);
@@ -156,7 +157,7 @@ void stage0(int** graph, int* node_count, int* path)
 
 void stage1(int** graph, int* node_count, int* path) 
 {
-		float3();
+		float4();
 		/* commented out for testing
     
     int** gap_list;
@@ -387,6 +388,58 @@ void float3()
 int flo3(int* gap)
 {
     return 0;
+}
+
+void float4()
+{
+		//I added a not_found flag to stop when a pattern has been found
+		bool not_found = true;
+    for (int i=0; i < *g_node_count && not_found; i++)
+    {
+		//the name of the nodes, not the index --maxime
+        int y = g_path[i];
+        int x = get_next_node(&y);
+
+        // found a gap
+        if (g_graph[y][x] == 1) continue;
+
+		//printf("Found gap between %i and %i\n", cur_node, next_node);
+
+		//e and c are temporary for now
+		int e = get_next_node(&x);
+		int c = get_next_node(&e);
+		//d and f are temporary for now
+		int d = get_prec_node(&y);
+		int f = get_prec_node(&d);
+		int b = get_prec_node(&f);
+
+		int a = c;
+		while(not_found) {
+				a = ladder_search(a, b, x);
+				if (a == 0) break;
+				b = get_next_node(&a);
+
+				//e is temporary for now
+				c = e;
+				while(not_found){
+						c = get_next_node(&c);
+						if (c == a) break;
+						e = get_prec_node(&c);
+						//f is temporary for now
+						f = get_next_node(&b);
+						int d = f;
+						while(not_found){
+								d = ladder_search(d, y, c);
+								if (d == 0) break;
+								f = get_prec_node(&d);
+								if(g_graph[e][b] || g_graph[f][y]){
+										not_found = false;
+										printf("y = %i, x = %i, e = %i, c = %i, a = %i, b = %i, d = %i, f = %i \n", y, x, e, c, a, b, d, f);
+								}
+						}
+				}
+		}
+	} //for
 }
 
 int flo4(int* gap)
