@@ -186,7 +186,7 @@ void stage1(int** graph, int* node_count, int* path)
     gap = malloc( 2 * sizeof(int*));
     
     clear_gap_list();
-    add_ordering_to_list(g_path, &found_flo_at, &start_at_index, &prev_gap_count);
+    add_ordering_to_list(g_path, 0, 0, gap_count);
 
     printf("Stage 1\n");
     while (true) {
@@ -201,10 +201,6 @@ void stage1(int** graph, int* node_count, int* path)
                 gap[0] = y;
                 gap[1] = x;
                 
-                if (is_gap_in_list(gap) == 1) {
-                    continue;
-                } //if
-                
                 // try each flo function until one
                 // can perform a transformation (returns 1)
                 for (int j = start_at_flo; j < 5; j++) {
@@ -213,7 +209,7 @@ void stage1(int** graph, int* node_count, int* path)
                         start_at_index = i;
                         found_flo_at = j;
                //         start_at_flo = j;
-                        printf("Found transformation in flo%i around gap [%i,%i] and %i gap left\n", j+1, gap[0],gap[1], gap_count);
+                        printf("Found transformation in flo%i around gap [%i,%i] and %i gap left\n", j+1, gap[0],gap[1], count_gaps());
                         //print_path(g_path, g_node_count);
                         break;
                     } //if
@@ -231,10 +227,6 @@ void stage1(int** graph, int* node_count, int* path)
             break; // we found a solution
         } //if
 
-        if (found_flo_at >= 0) {
-            break;
-        }  //if
-
         // 1.1 a) check that new ordering has a new gap not in gap_list
         // add ordering to ordering list 
         found_new_gap = -1;
@@ -251,7 +243,8 @@ void stage1(int** graph, int* node_count, int* path)
                     printf("Found gap %i, %i\n", gap[0],gap[1]);
                     found_new_gap = 1;
                     start_at_index = i;
-                    add_ordering_to_list(g_path, &found_flo_at, &start_at_index, &prev_gap_count);
+                    update_ordering(found_flo_at, start_at_index, gap_count);
+                    add_ordering_to_list(g_path, 0, 0, gap_count);
                     break;
                 } //if
             } //if

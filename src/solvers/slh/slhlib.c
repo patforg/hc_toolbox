@@ -235,7 +235,7 @@ int is_ordering_in_list(int* ordering)
     return found;
 }
 
-int add_ordering_to_list(int* ordering, int* current_flo, int* current_index, int* prev_gap_count)
+int add_ordering_to_list(int* ordering, int current_flo, int current_index, int prev_gap_count)
 {
     struct ordering_node* new_ordering;
 
@@ -244,9 +244,9 @@ int add_ordering_to_list(int* ordering, int* current_flo, int* current_index, in
     
     memcpy(new_ordering->ordering, ordering, (*g_node_count) * sizeof(int));
     new_ordering->next = NULL;
-    new_ordering->current_flo = *current_flo;
-    new_ordering->current_index = *current_index;
-    new_ordering->prev_gap_count = *prev_gap_count;
+    new_ordering->current_flo = current_flo;
+    new_ordering->current_index = current_index;
+    new_ordering->prev_gap_count = prev_gap_count;
 
     if (g_ordering_list == NULL) {
         g_ordering_list = new_ordering;
@@ -277,4 +277,13 @@ int backtrack_ordering(int* ordering, int* current_flo, int* current_index, int*
     }
 
     return 0;
+}
+
+int update_ordering(int current_flo, int current_index, int prev_gap_count)
+{
+    if (g_ordering_list_tail != NULL) {
+        g_ordering_list_tail->current_flo = current_flo;
+        g_ordering_list_tail->current_index = current_index;
+        g_ordering_list_tail->prev_gap_count = prev_gap_count;
+    } //if
 }
