@@ -13,6 +13,7 @@ static void print_usage();
 int main(int argc, char *argv[])
 {
 
+    /* read command line arguments */
     char *graph_file;
     char *out_file;
     FILE * fp;
@@ -27,6 +28,7 @@ int main(int argc, char *argv[])
     }
 
 
+    /* read graph file */
     int **graph;
     int node_count;
     int edge_count;
@@ -37,6 +39,7 @@ int main(int argc, char *argv[])
     int i;
     int j;
 
+    /* setup output file */
     fp = fopen(out_file,"w+");
     if (!fp) {
         printf("Could not open file for writting %s\n", out_file);
@@ -44,6 +47,7 @@ int main(int argc, char *argv[])
 
     }
 
+    /* write out dot format from graph */
     fputs("graph G {\n",fp);
     for (i = 1; i <= node_count; i++) {
         for (j = i+1; j <= node_count; j++) {
@@ -54,6 +58,7 @@ int main(int argc, char *argv[])
     }
     fputs("}",fp);
 
+    /* clean up */
     if (fp) {
         fclose(fp);
     }

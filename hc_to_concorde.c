@@ -14,6 +14,7 @@ static void print_usage();
 int main(int argc, char *argv[])
 {
 
+    /* read command line arguments */
     char *graph_file;
     char *out_file;
     FILE * fp;
@@ -28,6 +29,7 @@ int main(int argc, char *argv[])
     }
 
 
+    /* read graph file */
     int **graph;
     int node_count;
     int edge_count;
@@ -35,9 +37,11 @@ int main(int argc, char *argv[])
 
     printf("Graph has %d nodes and %d edges\n", node_count, edge_count);
 
+
     int i;
     int j;
 
+    /* setup the output file */
     fp = fopen(out_file,"w+");
     if (!fp) {
         printf("Could not open file for writting %s\n", out_file);
@@ -45,6 +49,7 @@ int main(int argc, char *argv[])
 
     }
 
+    /* convert 0 to 1 in adjacency matrix */
     for (i = 1; i <= node_count; i++) {
         for (j = 1; j <= node_count; j++) {
             if (j > 1) {
@@ -55,6 +60,7 @@ int main(int argc, char *argv[])
         fputs("\n",fp);
     }
 
+    /* cleanup */
     if (fp) {
         fclose(fp);
     }

@@ -264,14 +264,20 @@ int backtrack_ordering(int* ordering, int* current_flo, int* current_index, int*
     struct ordering_node* tmp_tail;
 
     if (g_ordering_list_tail != NULL) {
+
+        // take tail info and update passed variable
         memcpy(ordering, g_ordering_list_tail->ordering, (*g_node_count) * sizeof(int));
         *current_flo = g_ordering_list_tail->current_flo;
         *current_index = g_ordering_list_tail->current_index;
         *prev_gap_count = g_ordering_list_tail->prev_gap_count;
 
+        // remove tail and set new tail
         tmp_tail = g_ordering_list_tail;
         g_ordering_list_tail = g_ordering_list_tail->prev;
-        g_ordering_list_tail->next = NULL;
+        if (g_ordering_list_tail != NULL) {
+            g_ordering_list_tail->next = NULL;
+        } //if
+        free(tmp_tail->ordering);
         free(tmp_tail);
         return 1;
     }

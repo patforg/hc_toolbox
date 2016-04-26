@@ -8,15 +8,14 @@ static int* g_path;
 static int* g_node_index;
 static int** g_graph;
 
+/* local functions corresponding to SLH stages
+ * see paper for more details */
 static void stage0();
 static void stage1();
 static void stage2();
 static void stage3();
-static void float2();
-static void float3();
-static void float4();
-static void float5();
 
+/* local function for floating transformations */
 static int flo1(int* gap);
 static int flo2(int* gap);
 static int flo3(int* gap);
@@ -24,6 +23,9 @@ static int flo4(int* gap);
 static int flo5(int* gap);
 
 
+/**
+ * Entry point for the solver program
+ */
 bool slh(int** graph, int* node_count, int* edge_count, int* path)
 {
     int gap_count;
@@ -160,11 +162,12 @@ void stage0(int** graph, int* node_count, int* path)
 
 }
 
+/*************************************************************
+ *               STAGE 0: Floating Transformations           *
+ *************************************************************/
 void stage1(int** graph, int* node_count, int* path) 
 {
     
-    int** gap_list;
-    int** ordering_list;
     int prev_gap_count;
     int gap_count;
     int y,x;
@@ -210,7 +213,7 @@ void stage1(int** graph, int* node_count, int* path)
                         start_at_index = i;
                         found_flo_at = j;
                //         start_at_flo = j;
-                        printf("Found transformation in flo%i around gap [%i,%i] and %i gap left\n", j+1, gap[0],gap[1], count_gaps());
+                        //printf("Found transformation in flo%i around gap [%i,%i] and %i gap left\n", j+1, gap[0],gap[1], count_gaps());
                         //print_path(g_path, g_node_count);
                         break;
                     } //if
@@ -242,12 +245,12 @@ void stage1(int** graph, int* node_count, int* path)
                 gap[1] = x;
 
                 if (is_gap_in_list(gap) == 0) {
-                    printf("Found gap %i, %i\n", gap[0],gap[1]);
+                    //printf("Found gap %i, %i\n", gap[0],gap[1]);
                     found_new_gap = 1;
                     start_at_index = i;
 //                    update_ordering(found_flo_at, i, gap_count);
                     add_ordering_to_list(g_path, 0, 0, gap_count);
-                    break;
+                    break; // stop looking for gaps we found one
                 } //if
             } //if
         } //for
@@ -255,46 +258,61 @@ void stage1(int** graph, int* node_count, int* path)
         // 1.1 b) no new gap found revert to prev ordering and try another transformation
         if (found_new_gap == -1) {
             printf("No new gap found backtrack\n");
-            if (backtrack_ordering(g_path, &start_at_flo, &start_at_index, &prev_gap_count) == 1) {
+            if (backtrack_ordering(path, &start_at_flo, &start_at_index, &prev_gap_count) == 1) {
+                // we abort here since backtracking
+                // is broken at the moment we suspect
+                // a memory issue
+                break;
                 start_at_flo++;
                 gap_count = count_gaps();
-                printf("continuing index: %i, flo: %i...\n", start_at_index, start_at_flo);
+                printf("continuing index: %i, flo: %i\n", start_at_index, start_at_flo);
             } else {
                 printf("Cannot backtrack ordering list is empty\n");
                 break;
             } //if
         } //if
 
-        printf("after if\n");
+        //printf("after if\n");
         // 1.2 if transformation reduced number of gaps clear gaps and ordering. If gaps is 0 stop
         if (gap_count < prev_gap_count) {
-            printf("Reduced gaps to %i\n", gap_count);
+            //printf("Reduced gaps to %i\n", gap_count);
             clear_gap_list();
             clear_ordering_list();
             prev_gap_count = gap_count;
             start_at_index = 0;
             start_at_flo = 0;
         } //if
-        printf("after gap check\n");
+        //printf("after gap check\n");
 
     // 1.3 otherwise goto 1.1
     } //while
 
     free(gap);
+
+    printf("Reduced gaps to %i\n", gap_count);
+    g_path = path;
 }
 
+/*************************************************************
+ *               STAGE 2: Opening Transformation part 1      *
+ *************************************************************/
 void stage2(int** graph, int* node_count, int* path) 
 {
-
+    // TODO: implement stage 2
 }
 
-
-
+/*************************************************************
+ *               STAGE 3: Opening Transformation part 2      *
+ *************************************************************/
 void stage3(int** graph, int* node_count, int* path) 
 {
 
+    // TODO: implement stage 3
 }
 
+/**
+ * SLH flooating 2-flo transformation
+ */
 int flo1(int* gap)
 {
     int x,y,a,b,c,d;
@@ -339,56 +357,9 @@ int flo1(int* gap)
     return 0;
 }
 
-void float2()
-{
-		//I added a not_found flag to stop when a pattern has been found
-		bool not_found = true;
-    for (int i=0; i < *g_node_count && not_found; i++)
-    {
-		//the name of the nodes, not the index --maxime
-        int y = g_path[i];
-        int x = get_next_node(&y);
-
-        // found a gap
-        if (g_graph[y][x] == 1) continue;
-
-		//printf("Found gap between %i and %i\n", cur_node, next_node);
-
-		//can't be beside x because c must be in between
-		//int a = get_next_node(&x);
-		int a = get_next_node(&x);
-		while(not_found) {
-				a = ladder_search(a, y, x);
-				if (a == 0) break;
-				int c = get_prec_node(&a);
-						int b = a;
-						//d can't be beside a because b must be in between
-						int d = get_next_node(&a);
-						while(not_found){
-								//b can't be beside y because d must be in between
-								b = ladder_search(b, get_prec_node(&y), y);
-								if (b == 0) break;
-								d = get_next_node(&b);
-								not_found = false;
-						}
-						while(not_found){
-								//can't be beside y because d must be in between
-								d = ladder_search(d, y, c);
-								if (d == 0) break;
-								b = get_prec_node(&d);
-								not_found = false;
-						}
-						if(!not_found){
-								swap_nodes(x, c);
-								swap_nodes(d, y);
-								swap_nodes(c,d);
-								printf("y = %i, x = %i, a = %i, b = %i, c = %i, d = %i \n", y, x, a, b, c, d );
-						}
-
-		}
-	} //for
-}
-
+/**
+ * SLH flooating 3-flo transformation
+ */
 int flo2(int* gap)
 {
 	bool not_found = true;
@@ -427,67 +398,9 @@ int flo2(int* gap)
 	return (not_found ? 0 : 1);
 }
 
-void float3()
-{
-		//I added a not_found flag to stop when a pattern has been found
-		bool not_found = true;
-    for (int i=0; i < *g_node_count && not_found; i++)
-    {
-		//the name of the nodes, not the index --maxime
-        int y = g_path[i];
-        int x = get_next_node(&y);
-
-        // found a gap
-        if (g_graph[y][x] == 1) continue;
-
-		//printf("Found gap between %i and %i\n", cur_node, next_node);
-
-		//e and c are temporary for now
-		int e = get_next_node(&x);
-		int c = get_next_node(&e);
-		//d and f are temporary for now
-		int f = get_prec_node(&y);
-		int d = get_prec_node(&f);
-
-		int a = c;
-		while(not_found) {
-
-				//b is temporary for now
-				int b = get_prec_node(&d);
-				a = ladder_search(a, b, x);
-				if (a == 0) break;
-				b = get_next_node(&a);
-				//b must be connected to y
-				if (g_graph[b][y] == 0) continue;
-				//e is temporary for now
-				e = get_next_node(&x);
-				c = e;
-				while(not_found){
-						c = get_next_node(&c);
-						if (c == a) break;
-						e = get_prec_node(&c);
-
-						int d = b;
-						while(not_found){
-								d = ladder_search(d, f, c);
-								if (d == 0) break;
-								f = get_next_node(&d);
-								not_found = false;
-								swap_nodes(x,e);
-								swap_nodes(c,a);
-								swap_nodes(b,d);
-								swap_nodes(f,y);
-								printf("y = %i, x = %i, e = %i, c = %i, a = %i, b = %i, d = %i, f = %i \n", y, x, e, c, a, b, d, f);
-
-
-						}
-
-				}
-
-		}
-	} //for
-}
-
+/**
+ * SLH flooating 4-flo type 1 transformation
+ */
 int flo3(int* gap)
 {
 		//I added a not_found flag to stop when a pattern has been found
@@ -541,63 +454,9 @@ int flo3(int* gap)
 	return (not_found ? 0 : 1);
 }
 
-void float4()
-{
-		//I added a not_found flag to stop when a pattern has been found
-		bool not_found = true;
-    for (int i=0; i < *g_node_count && not_found; i++)
-    {
-		//the name of the nodes, not the index --maxime
-        int y = g_path[i];
-        int x = get_next_node(&y);
-
-        // found a gap
-        if (g_graph[y][x] == 1) continue;
-
-		//printf("Found gap between %i and %i\n", cur_node, next_node);
-
-		//e and c are temporary for now
-		int e = get_next_node(&x);
-		int c = get_next_node(&e);
-		//d and f are temporary for now
-		int d = get_prec_node(&y);
-		int f = get_prec_node(&d);
-		int b = get_prec_node(&f);
-
-		int a = c;
-		while(not_found) {
-				a = ladder_search(a, b, x);
-				if (a == 0) break;
-				b = get_next_node(&a);
-
-				//e is temporary for now
-				c = e;
-				while(not_found){
-						c = get_next_node(&c);
-						if (c == a) break;
-						e = get_prec_node(&c);
-						//f is temporary for now
-						f = get_next_node(&b);
-						int d = f;
-						while(not_found){
-								d = ladder_search(d, y, c);
-								if (d == 0) break;
-								f = get_prec_node(&d);
-								if(g_graph[e][b] || g_graph[f][y]){
-										not_found = false;
-										printf("y = %i, x = %i, e = %i, c = %i, a = %i, b = %i, d = %i, f = %i \n", y, x, e, c, a, b, d, f);
-										switch_nodes(c,a,b,f);
-										switch_nodes(x,e,b,f);
-										swap_nodes(x,e);
-										swap_nodes(c,a);
-										swap_nodes(b,f);
-								}
-						}
-				}
-		}
-	} //for
-}
-
+/**
+ * SLH flooating 4-flo type 2 transformation
+ */
 int flo4(int* gap)
 {
 		int y = gap[0];
@@ -645,75 +504,9 @@ int flo4(int* gap)
 	return (not_found ? 0 : 1);
 }
 
-void float5()
-{
-		//I added a not_found flag to stop when a pattern has been found
-		bool not_found = true;
-    for (int i=0; i < *g_node_count && not_found; i++)
-    {
-			printf("test1");
-		//the name of the nodes, not the index --maxime
-        int y = g_path[i];
-        int x = get_next_node(&y);
-
-        // found a gap
-        if (g_graph[y][x] == 1) continue;
-
-		//printf("Found gap between %i and %i\n", cur_node, next_node);
-
-		//e and c are temporary for now
-		int e = get_next_node(&x);
-		int c = get_next_node(&e);
-		int a = c;
-		while(not_found) {
-				a = ladder_search(a, y, x);
-				if (a == 0) break;
-				int f = get_next_node(&a);
-				//c is temporary for now
-				c = get_prec_node(&a);
-				int e = x;
-				while(not_found){
-						e = ladder_search(e, c, f);
-						if (e == 0) break;
-						int c = get_next_node(&e);
-						//g b, h and j are temporary for now
-						int g = get_next_node(&f);
-						int b = get_next_node(&g);
-						int j = get_next_node(&b);
-						int h = get_prec_node(&y);
-
-						int d = j;
-						while(not_found){
-								d = ladder_search(d, h, c);
-								if (d == 0) break;
-								h = get_next_node(&d);
-								j = get_prec_node(&d);
-
-								int b = g;
-								while(not_found){
-										b = ladder_search(b, j, y);
-										if (b == 0) break;
-										g = get_prec_node(&b);
-										not_found = false;
-										printf("y = %i, x = %i, e = %i, c = %i, a = %i, f = %i, g = %i, b = %i, j = %i, d = %i, h = %i \n", y, x, e, c, a, f, g, b, j, d, h);
-										switch_nodes(c,a,f,g);
-										switch_nodes(x,e,f,g);
-										swap_nodes(x,e);
-										swap_nodes(c,a);
-										swap_nodes(f,g);
-										swap_nodes(b,d);
-										swap_nodes(h,y);
-
-
-								}
-						}
-
-				}
-
-		}
-	} //for
-}
-
+/**
+ * SLH flooating 5-flo transformation
+ */
 int flo5(int* gap)
 {
 		int y = gap[0];

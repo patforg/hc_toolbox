@@ -7,12 +7,16 @@
 
 #define LINESIZE 512 /* maximum line size */
 
+/* local var to turn debug messages on or off */
 static bool debug = true;
 static void dprint(char *msg) {
     if (debug) 
         printf("%s\n", msg);
 }
 
+/**
+ * reads TSPLIF format graph from file name
+ */
 int** read_graph(char* file, int *node_count, int *edge_count)
 {
     FILE * fp = fopen(file, "r");
@@ -102,6 +106,9 @@ int** read_graph(char* file, int *node_count, int *edge_count)
 }
 
 
+/**
+ * clean up graph's heap memory
+ */
 void free_graph(int **graph, int *node_count)
 {
 
@@ -118,6 +125,9 @@ void free_graph(int **graph, int *node_count)
 
 }
 
+/**
+ * read TSPLIB tour file format (node list)
+ */
 int* read_tour(char* file, int *node_count)
 {
     FILE * fp = fopen(file, "r");
@@ -201,11 +211,17 @@ int* read_tour(char* file, int *node_count)
 }
 
 
+/**
+ * clean up tour heap memory
+ */
 void free_tour(int *tour)
 {
     free(tour);
 }
 
+/**
+ * checks that provided tour is a valid Hamiltonian Cycle for graph
+ */
 bool hc_validate(int* tour, int tour_node_count, int** graph, int node_count, bool verbose)
 {
 
@@ -305,6 +321,9 @@ bool hc_validate(int* tour, int tour_node_count, int** graph, int node_count, bo
     return valid;
 }
 
+/**
+ * Prints a comma seperated path
+ */
 void print_path(int* path, int* node_count)
 {
     printf("%i", path[0]);

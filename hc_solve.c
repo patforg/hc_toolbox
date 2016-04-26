@@ -16,6 +16,7 @@ static void print_usage();
 int main(int argc, char *argv[])
 {
 
+    /* read command line arguments */
     char *solver;
     char *graph_file;
     char *out_file;
@@ -33,6 +34,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    /* read graph file */
     int **graph;
     int node_count;
     int edge_count;
@@ -44,14 +46,17 @@ int main(int argc, char *argv[])
     printf("Graph has %d nodes and %d edges\n", node_count, edge_count);
     path = malloc( node_count * sizeof(int*));
 
+    /* call the appropriate solver */
     if (strcmp("backtrack", solver) == 0) {
         found_solution = backtrack(graph, &node_count, &edge_count, path);
     } else if (strcmp("slh", solver) == 0) {
         found_solution = slh(graph, &node_count, &edge_count, path);
     } else {
         printf("Unknown solver: %s", solver);
+        return 1;
     }
 
+    /* check results obtained by solver */
     if (found_solution) {
         // print solution
         printf("Suggested path:");
@@ -96,6 +101,7 @@ int main(int argc, char *argv[])
         printf("No solution could be found \n");
     } //if
     
+    /* clean up */
     free(path);
     free_graph(graph, &node_count);
 
