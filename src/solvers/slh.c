@@ -186,10 +186,11 @@ void stage1(int** graph, int* node_count, int* path)
     gap = malloc( 2 * sizeof(int*));
     
     clear_gap_list();
-    add_ordering_to_list(g_path, 0, 0, gap_count);
+    //add_ordering_to_list(g_path, 0, 0, gap_count);
 
     printf("Stage 1\n");
-    while (true) {
+    while (1) {
+        printf(".");
         found_flo_at  = -1;
         for (int i=start_at_index; i < *node_count; i++)
         {
@@ -227,6 +228,7 @@ void stage1(int** graph, int* node_count, int* path)
             break; // we found a solution
         } //if
 
+
         // 1.1 a) check that new ordering has a new gap not in gap_list
         // add ordering to ordering list 
         found_new_gap = -1;
@@ -243,7 +245,7 @@ void stage1(int** graph, int* node_count, int* path)
                     printf("Found gap %i, %i\n", gap[0],gap[1]);
                     found_new_gap = 1;
                     start_at_index = i;
-                    update_ordering(found_flo_at, start_at_index, gap_count);
+//                    update_ordering(found_flo_at, i, gap_count);
                     add_ordering_to_list(g_path, 0, 0, gap_count);
                     break;
                 } //if
@@ -256,13 +258,14 @@ void stage1(int** graph, int* node_count, int* path)
             if (backtrack_ordering(g_path, &start_at_flo, &start_at_index, &prev_gap_count) == 1) {
                 start_at_flo++;
                 gap_count = count_gaps();
-                continue;
+                printf("continuing index: %i, flo: %i...\n", start_at_index, start_at_flo);
             } else {
                 printf("Cannot backtrack ordering list is empty\n");
                 break;
             } //if
         } //if
 
+        printf("after if\n");
         // 1.2 if transformation reduced number of gaps clear gaps and ordering. If gaps is 0 stop
         if (gap_count < prev_gap_count) {
             printf("Reduced gaps to %i\n", gap_count);
@@ -272,6 +275,7 @@ void stage1(int** graph, int* node_count, int* path)
             start_at_index = 0;
             start_at_flo = 0;
         } //if
+        printf("after gap check\n");
 
     // 1.3 otherwise goto 1.1
     } //while
