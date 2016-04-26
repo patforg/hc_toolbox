@@ -36,7 +36,7 @@ bool slh(int** graph, int* node_count, int* edge_count, int* path)
     slhlib_init(node_count,path,graph);
 
     printf("Started with  : %i gaps\n", count_gaps());
-    print_path(g_path, g_node_count);
+//    print_path(g_path, g_node_count);
 
     stage0(graph, node_count, path);
     stage1(graph, node_count, path);
@@ -45,8 +45,8 @@ bool slh(int** graph, int* node_count, int* edge_count, int* path)
     stage1();
     */
 
-    printf("Final path:");
-    print_path(path, node_count);
+//    printf("Final path:");
+//    print_path(path, node_count);
     gap_count = count_gaps();
     printf("Left with  : %i gaps\n", gap_count);
 
@@ -135,13 +135,13 @@ void stage0(int** graph, int* node_count, int* path)
                         if (inner_next_next_node != cur_node
                             && graph[inner_next_next_node][inner_prec_node]) {
                             
-                            printf("Closing 3-opt between nodes %i and %i\n", cur_node, next_node);
-                            printf("Swapped %i, %i and %i, %i\n", next_node, inner_prec_node, inner_next_next_node, cur_node);
-                            print_path(path, node_count);
+                            //printf("Closing 3-opt between nodes %i and %i\n", cur_node, next_node);
+                            //printf("Swapped %i, %i and %i, %i\n", next_node, inner_prec_node, inner_next_next_node, cur_node);
+                            //print_path(path, node_count);
                             swap_nodes( next_node, inner_prec_node);
                             swap_nodes( inner_next_next_node, cur_node);
 
-                            print_path(path, node_count);
+                            //print_path(path, node_count);
 
                             inner_next_node = 0; // stop looking for next nodes
                             i = 0; // reset i
@@ -165,9 +165,13 @@ void stage1(int** graph, int* node_count, int* path)
     
     int** gap_list;
     int** ordering_list;
-    int min_gap_count = 0;
+    int prev_gap_count;
+    int gap_count;
     int y,x;
-    int found = 0;
+    int found_flo_at;
+    int found_new_gap;
+    int start_at_flo = 0;
+    int start_at_index = 0;
     int* gap;
     int (*flo_functions[5])(int* gap);
     
@@ -177,47 +181,107 @@ void stage1(int** graph, int* node_count, int* path)
     flo_functions[3] = flo4;
     flo_functions[4] = flo5;
     
+    gap_count = count_gaps();
+    prev_gap_count = gap_count;
     gap = malloc( 2 * sizeof(int*));
     
     clear_gap_list();
+    add_ordering_to_list(g_path, &found_flo_at, &start_at_index, &prev_gap_count);
 
-    for (int i=0; i < *node_count; i++)
-    {
-        y = path[i];
-        x = get_next_node(&y);
+    printf("Stage 1\n");
+    while (true) {
+        found_flo_at  = -1;
+        for (int i=start_at_index; i < *node_count; i++)
+        {
+            y = path[i];
+            x = get_next_node(&y);
 
-        // found a gap
-        if (graph[y][x] == 0) {
-            gap[0] = y;
-            gap[1] = x;
+            // found a gap
+            if (graph[y][x] == 0) {
+                gap[0] = y;
+                gap[1] = x;
+                
+                if (is_gap_in_list(gap) == 1) {
+                    continue;
+                } //if
+                
+                // try each flo function until one
+                // can perform a transformation (returns 1)
+                for (int j = start_at_flo; j < 5; j++) {
+                    if ( (*flo_functions[j])(gap) == 1) {
+                        add_gap_to_list(gap);
+                        start_at_index = i;
+                        found_flo_at = j;
+               //         start_at_flo = j;
+                        printf("Found transformation in flo%i around gap [%i,%i] and %i gap left\n", j+1, gap[0],gap[1], gap_count);
+                        //print_path(g_path, g_node_count);
+                        break;
+                    } //if
+                } //for
 
-            // try each flo function until one
-            // can perform a transformation (returns 1)
-            for (int j=1; j < 5; j++) {
-                if ( (*flo_functions[j])(gap) == 1) {
-                    found = 1;
-                    printf("Found transformation in flo%i\n", j);
+                if (found_flo_at >= 0) {
+                    break;
+                }  //if
+
+            } //if
+        } //for
+
+        gap_count = count_gaps();
+        if (gap_count == 0) {
+            break; // we found a solution
+        } //if
+
+        if (found_flo_at >= 0) {
+            break;
+        }  //if
+
+        // 1.1 a) check that new ordering has a new gap not in gap_list
+        // add ordering to ordering list 
+        found_new_gap = -1;
+        for (int i=0; i < *node_count; i++) {
+            y = path[i];
+            x = get_next_node(&y);
+
+            // found a gap
+            if (graph[y][x] == 0) {
+                gap[0] = y;
+                gap[1] = x;
+
+                if (is_gap_in_list(gap) == 0) {
+                    printf("Found gap %i, %i\n", gap[0],gap[1]);
+                    found_new_gap = 1;
+                    start_at_index = i;
+                    add_ordering_to_list(g_path, &found_flo_at, &start_at_index, &prev_gap_count);
                     break;
                 } //if
-            } //for
+            } //if
+        } //for
 
-            add_gap_to_list(gap);
-
-            // TODO:
-            // 1.1 a) check that new ordering has a new gap not in gap_list (goto 1.2)
-            // 1.1 b) no new gap found revert to prev ordering and try another transformation
-            // 1.1 c) no transformation can be done goto stage 2
-            // 1.2 if transformation reduced number of gaps clear gaps and ordering. If gaps is 0 stop
-            // 1.3 otherwise goto 1.1
-
-            if (found == 1) {
-                // exit loop (for now)
-                // as soon as we found a
-                // valid flo pattern
+        // 1.1 b) no new gap found revert to prev ordering and try another transformation
+        if (found_new_gap == -1) {
+            printf("No new gap found backtrack\n");
+            if (backtrack_ordering(g_path, &start_at_flo, &start_at_index, &prev_gap_count) == 1) {
+                start_at_flo++;
+                gap_count = count_gaps();
+                continue;
+            } else {
+                printf("Cannot backtrack ordering list is empty\n");
                 break;
-            }  //if
+            } //if
         } //if
-    } //for
+
+        // 1.2 if transformation reduced number of gaps clear gaps and ordering. If gaps is 0 stop
+        if (gap_count < prev_gap_count) {
+            printf("Reduced gaps to %i\n", gap_count);
+            clear_gap_list();
+            clear_ordering_list();
+            prev_gap_count = gap_count;
+            start_at_index = 0;
+            start_at_flo = 0;
+        } //if
+
+    // 1.3 otherwise goto 1.1
+    } //while
 
     free(gap);
 }

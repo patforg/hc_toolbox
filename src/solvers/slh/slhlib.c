@@ -79,7 +79,7 @@ void swap_nodes(int node_a, int node_b) {
 
     item_to_swap = floor( item_to_swap / 2);
 
-    printf("Count: %i Start: %i, end: %i swaps: %i\n", *g_node_count, node_a_index, node_b_index, item_to_swap);
+    //printf("Count: %i Start: %i, end: %i swaps: %i\n", *g_node_count, node_a_index, node_b_index, item_to_swap);
 
     while (item_to_swap > 0) {
 
@@ -97,7 +97,7 @@ void swap_nodes(int node_a, int node_b) {
         node_a_index = (node_a_index == *g_node_count-1) ? 0 : node_a_index+1;
         node_b_index = (node_b_index == 0) ? *g_node_count-1 : node_b_index-1;
         
-        printf("New a index: %i new b index: %i\n",node_a_index, node_b_index);
+        //printf("New a index: %i new b index: %i\n",node_a_index, node_b_index);
 
         node_a = g_path[node_a_index];
         node_b = g_path[node_b_index];
@@ -235,7 +235,7 @@ int is_ordering_in_list(int* ordering)
     return found;
 }
 
-int add_ordering_to_list(int* ordering)
+int add_ordering_to_list(int* ordering, int* current_flo, int* current_index, int* prev_gap_count)
 {
     struct ordering_node* new_ordering;
 
@@ -244,6 +244,9 @@ int add_ordering_to_list(int* ordering)
     
     memcpy(new_ordering->ordering, ordering, (*g_node_count) * sizeof(int));
     new_ordering->next = NULL;
+    new_ordering->current_flo = *current_flo;
+    new_ordering->current_index = *current_index;
+    new_ordering->prev_gap_count = *prev_gap_count;
 
     if (g_ordering_list == NULL) {
         g_ordering_list = new_ordering;
@@ -254,4 +257,24 @@ int add_ordering_to_list(int* ordering)
     } //if
 
     g_ordering_list_tail = new_ordering;
+}
+
+int backtrack_ordering(int* ordering, int* current_flo, int* current_index, int* prev_gap_count)
+{
+    struct ordering_node* tmp_tail;
+
+    if (g_ordering_list_tail != NULL) {
+        memcpy(ordering, g_ordering_list_tail->ordering, (*g_node_count) * sizeof(int));
+        *current_flo = g_ordering_list_tail->current_flo;
+        *current_index = g_ordering_list_tail->current_index;
+        *prev_gap_count = g_ordering_list_tail->prev_gap_count;
+
+        tmp_tail = g_ordering_list_tail;
+        g_ordering_list_tail = g_ordering_list_tail->prev;
+        g_ordering_list_tail->next = NULL;
+        free(tmp_tail);
+        return 1;
+    }
+
+    return 0;
 }

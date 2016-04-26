@@ -1,5 +1,8 @@
 struct ordering_node {
     int* ordering;
+    int current_flo;
+    int current_index;
+    int prev_gap_count;
     struct ordering_node *next;
     struct ordering_node *prev;
 };
@@ -21,4 +24,5 @@ int add_gap_to_list(int* gap);
 
 void clear_ordering_list();
 int is_ordering_in_list(int* ordering);
-int add_ordering_to_list(int* ordering);
+int add_ordering_to_list(int* ordering, int* current_flo, int* current_index, int* prev_gap_count);
+int backtrack_ordering(int* ordering, int* current_flo, int* current_index, int* prev_gap_count);
