@@ -1,3 +1,4 @@
+#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -8,6 +9,9 @@ static int* g_node_count;
 static int* g_path;
 static int* g_node_index;
 static int** g_graph;
+static int** g_gap_list;
+static struct ordering_node* g_ordering_list;
+static struct ordering_node* g_ordering_list_tail;
 
 void slhlib_init(int* node_count, int* path, int** graph)
 {
@@ -19,6 +23,19 @@ void slhlib_init(int* node_count, int* path, int** graph)
     g_graph = graph;
 
     g_node_index  = malloc( (*g_node_count+1) * sizeof(int*));
+
+    /* initialize gap list */
+    g_gap_list = malloc( (*node_count) * sizeof(int*));
+    int i;
+    for (i = 0; i < *node_count; i++) 
+    {
+        g_gap_list[i] = malloc( (*node_count+1) * sizeof(int*));
+    } // for
+    clear_gap_list();
+
+    /* initialize ordering list */
+    g_ordering_list = NULL;
+    g_ordering_list_tail = NULL;
 
     // initialize all path positions to zero
     for (int i=0; i < *g_node_count; i++)
@@ -32,8 +49,6 @@ void slhlib_init(int* node_count, int* path, int** graph)
 
     g_node_index[ *g_node_count ] = *g_node_count - 1;
 
-    printf("Started with  : %i gaps\n", count_gaps());
-    print_path(g_path, g_node_count);
 }
 
 int get_prec_node(int* cur_node) {
@@ -123,4 +138,113 @@ int count_gaps() {
     }
 
     return gap_count;
+}
+
+void clear_gap_list()
+{
+    int i, j;
+    for (i = 0; i < *g_node_count; i++) 
+    {
+        for (j = 0; j < *g_node_count; j++)
+        {
+            g_gap_list[i][j] = 0;
+        }
+    }
+}
+
+int is_gap_in_list(int* gap)
+{
+   int x = gap[1]-1;
+   int y = gap[0]-1;
+
+   return ( g_gap_list[x][y] == 1 ? 1 : 0);
+}
+
+int add_gap_to_list(int* gap)
+{
+   int x = gap[1]-1;
+   int y = gap[0]-1;
+    
+   g_gap_list[x][y] = 1;
+   g_gap_list[y][x] = 1;
+   
+}
+
+void clear_ordering_list()
+{
+    struct ordering_node* tmp_tail;
+    while (g_ordering_list_tail != NULL) {
+        tmp_tail = g_ordering_list_tail;
+        g_ordering_list_tail = g_ordering_list_tail->prev;
+        free(tmp_tail);
+    } //while
+    g_ordering_list = NULL;
+}
+
+int is_ordering_in_list(int* ordering)
+{
+    struct ordering_node* cur_node;
+    int pos, i;
+    int first_node = ordering[0];
+    int found = 0;
+    int same;
+
+    cur_node = g_ordering_list;
+
+    while(cur_node != NULL) {
+
+        // compare ordering starting from the same node
+        // pos will hold the position of first node
+        pos = -1;
+        for (i = 0; i < *g_node_count; i++) {
+            if (cur_node->ordering[i] == first_node) {
+                pos = i;
+                break;
+            } //if 
+        } //for
+
+        if (pos == -1) {
+            cur_node = cur_node->next;
+            continue;
+        } //if
+
+        int same = 1;
+        for (i = 1; i < *g_node_count; i++) {
+            pos = (pos+1) % *g_node_count;
+            if (cur_node->ordering[i] != ordering[i]) {
+                same = 0;
+                break;
+            } //if
+        } //for
+
+        if (same == 1) {
+            found = 1;
+            break;
+        } //if
+
+        cur_node = cur_node->next;
+    } //while
+
+    return found;
+}
+
+int add_ordering_to_list(int* ordering)
+{
+    struct ordering_node* new_ordering;
+
+    new_ordering = malloc(sizeof(struct ordering_node));
+    new_ordering->ordering = malloc( (*g_node_count) * sizeof(int));
+    
+    memcpy(new_ordering->ordering, ordering, (*g_node_count) * sizeof(int));
+    new_ordering->next = NULL;
+
+    if (g_ordering_list == NULL) {
+        g_ordering_list = new_ordering;
+        new_ordering->prev = NULL;
+    } else {
+        new_ordering->prev = g_ordering_list_tail;
+        g_ordering_list_tail->next = new_ordering;
+    } //if
+
+    g_ordering_list_tail = new_ordering;
 }

@@ -32,6 +32,10 @@ bool slh(int** graph, int* node_count, int* edge_count, int* path)
     g_graph = graph;
 
     slhlib_init(node_count,path,graph);
+
+    printf("Started with  : %i gaps\n", count_gaps());
+    print_path(g_path, g_node_count);
+
     stage0(graph, node_count, path);
     stage1(graph, node_count, path);
     /*
@@ -43,6 +47,7 @@ bool slh(int** graph, int* node_count, int* edge_count, int* path)
     print_path(path, node_count);
     gap_count = count_gaps();
     printf("Left with  : %i gaps\n", gap_count);
+
     return gap_count == 0 ? true : false ;
 }
 
@@ -172,6 +177,8 @@ void stage1(int** graph, int* node_count, int* path)
     
     gap = malloc( 2 * sizeof(int*));
     
+    clear_gap_list();
+
     for (int i=0; i < *node_count; i++)
     {
         y = path[i];
@@ -181,7 +188,6 @@ void stage1(int** graph, int* node_count, int* path)
         if (graph[y][x] == 0) {
             gap[0] = y;
             gap[1] = x;
-            // TODO:  save g in gap list
 
             // try each flo function until one
             // can perform a transformation (returns 1)
@@ -192,6 +198,8 @@ void stage1(int** graph, int* node_count, int* path)
                     break;
                 } //if
             } //for
+
+            add_gap_to_list(gap);
 
             // TODO:
             // 1.1 a) check that new ordering has a new gap not in gap_list (goto 1.2)
