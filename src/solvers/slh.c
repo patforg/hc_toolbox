@@ -328,7 +328,7 @@ int flo2(int* gap)
     return 0;
 }
 
-void float4()
+void float3()
 {
 		//I added a not_found flag to stop when a pattern has been found
 		bool not_found = true;
@@ -439,6 +439,11 @@ void float4()
 								if(g_graph[e][b] || g_graph[f][y]){
 										not_found = false;
 										printf("y = %i, x = %i, e = %i, c = %i, a = %i, b = %i, d = %i, f = %i \n", y, x, e, c, a, b, d, f);
+										switch_nodes(c,a,b,f);
+										switch_nodes(x,e,b,f);
+										swap_nodes(x,e);
+										swap_nodes(c,a);
+										swap_nodes(b,f);
 								}
 						}
 				}

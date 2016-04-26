@@ -92,6 +92,13 @@ void swap_nodes(int node_a, int node_b) {
 
 }
 
+//this is an inefficient version which uses swap_nodes to keep code simple
+void switch_nodes(int a, int b, int c, int d){
+		swap_nodes(a,d);
+		swap_nodes(b,a);
+		swap_nodes(d,c);
+}
+
 int ladder_search(int start_node, int end_node, int target_node)
 {
    int found_node = 0;
