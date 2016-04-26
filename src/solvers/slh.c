@@ -34,7 +34,7 @@ bool slh(int** graph, int* node_count, int* edge_count, int* path)
     g_graph = graph;
 
     slhlib_init(node_count,path,graph);
-    //stage0(graph, node_count, path);
+    stage0(graph, node_count, path);
     stage1(graph, node_count, path);
     /*
     init();
@@ -157,8 +157,6 @@ void stage0(int** graph, int* node_count, int* path)
 
 void stage1(int** graph, int* node_count, int* path) 
 {
-		float5();
-		/* commented out for testing
     
     int** gap_list;
     int** ordering_list;
@@ -189,7 +187,7 @@ void stage1(int** graph, int* node_count, int* path)
 
             // try each flo function until one
             // can perform a transformation (returns 1)
-            for (int j=0; j < 5; j++) {
+            for (int j=1; j < 5; j++) {
                 if ( (*flo_functions[j])(gap) == 1) {
                     found = 1;
                     printf("Found transformation in flo%i\n", j);
@@ -214,7 +212,6 @@ void stage1(int** graph, int* node_count, int* path)
     } //for
 
     free(gap);
-	*/
 }
 
 void stage2(int** graph, int* node_count, int* path) 
@@ -325,7 +322,40 @@ void float2()
 
 int flo2(int* gap)
 {
-    return 0;
+	bool not_found = true;
+    int y = gap[0];
+    int x = gap[1];
+	int a = get_next_node(&x);
+	while(not_found) {
+			a = ladder_search(a, y, x);
+			if (a == 0) break;
+			int c = get_prec_node(&a);
+			int b = a;
+			//d can't be beside a because b must be in between
+			int d = get_next_node(&a);
+			while(not_found){
+					//b can't be beside y because d must be in between
+					b = ladder_search(b, get_prec_node(&y), y);
+					if (b == 0) break;
+					d = get_next_node(&b);
+					not_found = false;
+			}
+			while(not_found){
+					//can't be beside y because d must be in between
+					d = ladder_search(d, y, c);
+					if (d == 0) break;
+					b = get_prec_node(&d);
+					not_found = false;
+			}
+			if(!not_found){
+					swap_nodes(x, c);
+					swap_nodes(d, y);
+					swap_nodes(c,d);
+					//printf("y = %i, x = %i, a = %i, b = %i, c = %i, d = %i \n", y, x, a, b, c, d );
+			}
+
+	}
+	return (not_found ? 0 : 1);
 }
 
 void float3()
@@ -391,7 +421,55 @@ void float3()
 
 int flo3(int* gap)
 {
-    return 0;
+		//I added a not_found flag to stop when a pattern has been found
+		bool not_found = true;
+		int y = gap[0];
+		int x = gap[1];
+
+		//e and c are temporary for now
+		int e = get_next_node(&x);
+		int c = get_next_node(&e);
+		//d and f are temporary for now
+		int f = get_prec_node(&y);
+		int d = get_prec_node(&f);
+
+		int a = c;
+		while(not_found) {
+
+				//b is temporary for now
+				int b = get_prec_node(&d);
+				a = ladder_search(a, b, x);
+				if (a == 0) break;
+				b = get_next_node(&a);
+				//b must be connected to y
+				if (g_graph[b][y] == 0) continue;
+				//e is temporary for now
+				e = get_next_node(&x);
+				c = e;
+				while(not_found){
+						c = get_next_node(&c);
+						if (c == a) break;
+						e = get_prec_node(&c);
+
+						int d = b;
+						while(not_found){
+								d = ladder_search(d, f, c);
+								if (d == 0) break;
+								f = get_next_node(&d);
+								not_found = false;
+								swap_nodes(x,e);
+								swap_nodes(c,a);
+								swap_nodes(b,d);
+								swap_nodes(f,y);
+								//printf("y = %i, x = %i, e = %i, c = %i, a = %i, b = %i, d = %i, f = %i \n", y, x, e, c, a, b, d, f);
+
+
+						}
+
+				}
+
+		}
+	return (not_found ? 0 : 1);
 }
 
 void float4()
@@ -453,7 +531,49 @@ void float4()
 
 int flo4(int* gap)
 {
-    return 0;
+		int y = gap[0];
+		int x = gap[1];
+		bool not_found = true;
+		//e and c are temporary for now
+		int e = get_next_node(&x);
+		int c = get_next_node(&e);
+		//d and f are temporary for now
+		int d = get_prec_node(&y);
+		int f = get_prec_node(&d);
+		int b = get_prec_node(&f);
+
+		int a = c;
+		while(not_found) {
+				a = ladder_search(a, b, x);
+				if (a == 0) break;
+				b = get_next_node(&a);
+
+				//e is temporary for now
+				c = e;
+				while(not_found){
+						c = get_next_node(&c);
+						if (c == a) break;
+						e = get_prec_node(&c);
+						//f is temporary for now
+						f = get_next_node(&b);
+						int d = f;
+						while(not_found){
+								d = ladder_search(d, y, c);
+								if (d == 0) break;
+								f = get_prec_node(&d);
+								if(g_graph[e][b] || g_graph[f][y]){
+										not_found = false;
+										//printf("y = %i, x = %i, e = %i, c = %i, a = %i, b = %i, d = %i, f = %i \n", y, x, e, c, a, b, d, f);
+										switch_nodes(c,a,b,f);
+										switch_nodes(x,e,b,f);
+										swap_nodes(x,e);
+										swap_nodes(c,a);
+										swap_nodes(b,f);
+								}
+						}
+				}
+		}
+	return (not_found ? 0 : 1);
 }
 
 void float5()
@@ -527,6 +647,60 @@ void float5()
 
 int flo5(int* gap)
 {
-    return 0;
+		int y = gap[0];
+		int x = gap[1];
+		bool not_found = true;
+
+		//e and c are temporary for now
+		int e = get_next_node(&x);
+		int c = get_next_node(&e);
+		int a = c;
+		while(not_found) {
+				a = ladder_search(a, y, x);
+				if (a == 0) break;
+				int f = get_next_node(&a);
+				//c is temporary for now
+				c = get_prec_node(&a);
+				int e = x;
+				while(not_found){
+						e = ladder_search(e, c, f);
+						if (e == 0) break;
+						int c = get_next_node(&e);
+						//g b, h and j are temporary for now
+						int g = get_next_node(&f);
+						int b = get_next_node(&g);
+						int j = get_next_node(&b);
+						int h = get_prec_node(&y);
+
+						int d = j;
+						while(not_found){
+								d = ladder_search(d, h, c);
+								if (d == 0) break;
+								h = get_next_node(&d);
+								j = get_prec_node(&d);
+
+								int b = g;
+								while(not_found){
+										b = ladder_search(b, j, y);
+										if (b == 0) break;
+										g = get_prec_node(&b);
+										not_found = false;
+										//printf("y = %i, x = %i, e = %i, c = %i, a = %i, f = %i, g = %i, b = %i, j = %i, d = %i, h = %i \n", y, x, e, c, a, f, g, b, j, d, h);
+										switch_nodes(c,a,f,g);
+										switch_nodes(x,e,f,g);
+										swap_nodes(x,e);
+										swap_nodes(c,a);
+										swap_nodes(f,g);
+										swap_nodes(b,d);
+										swap_nodes(h,y);
+
+
+								}
+						}
+
+				}
+
+		}
+	return (not_found ? 0 : 1);
 }
 
