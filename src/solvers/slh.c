@@ -32,7 +32,7 @@ bool slh(int** graph, int* node_count, int* edge_count, int* path)
     g_graph = graph;
 
     slhlib_init(node_count,path,graph);
-    stage0(graph, node_count, path);
+    //stage0(graph, node_count, path);
     stage1(graph, node_count, path);
     /*
     init();
@@ -155,6 +155,8 @@ void stage0(int** graph, int* node_count, int* path)
 
 void stage1(int** graph, int* node_count, int* path) 
 {
+		float5();
+		/* commented out for testing
     
     int** gap_list;
     int** ordering_list;
@@ -210,11 +212,63 @@ void stage1(int** graph, int* node_count, int* path)
     } //for
 
     free(gap);
+	*/
 }
 
 void stage2(int** graph, int* node_count, int* path) 
 {
 
+}
+
+
+
+void stage3(int** graph, int* node_count, int* path) 
+{
+
+}
+
+int flo1(int* gap)
+{
+    int x,y,a,b,c,d;
+    int prec_node;
+
+    y = gap[0];
+    x = gap[1];
+
+    for (int i = 0; i < *g_node_count; i++) {
+
+        a = g_path[i];
+        c = get_prec_node(&a);
+
+        // look for a edge between x and a
+        if (g_graph[x][a] == 1) {        
+
+            // from a find an edge b connected to a
+            // or has a path to a and is connected to y
+            // or if the following node d is connected to 
+            // c node
+            prec_node = a;
+            b = get_next_node(&a);
+            while (g_graph[prec_node][b] == 1 && b != y) {
+                
+                d = get_next_node(&b);
+                if (g_graph[b][y] == 1
+                    || g_graph[d][c] ==1) {
+                    swap_nodes(d,y);
+                    swap_nodes(x,c);
+                    return 1;
+                } //if
+
+                // move to next node
+                prec_node = b;
+                b = get_next_node(&b);
+
+            } //while
+        } //if
+        
+    } //for
+
+    return 0;
 }
 
 void float2()
@@ -267,12 +321,28 @@ void float2()
 	} //for
 }
 
+int flo2(int* gap)
+{
+    return 0;
+}
+
+int flo3(int* gap)
+{
+    return 0;
+}
+
+int flo4(int* gap)
+{
+    return 0;
+}
+
 void float5()
 {
 		//I added a not_found flag to stop when a pattern has been found
 		bool not_found = true;
     for (int i=0; i < *g_node_count && not_found; i++)
     {
+			printf("test1");
 		//the name of the nodes, not the index --maxime
         int y = g_path[i];
         int x = get_next_node(&y);
@@ -289,11 +359,11 @@ void float5()
 				a = ladder_search(a, y, x);
 				if (a == 0) break;
 				int f = get_next_node(&a);
-				//d can't be beside a because b must be in between
+				//c is temporary for now
+				int c = get_prec_node(&a);
 				int e = x;
 				while(not_found){
-						//e can't be beside a because c must be in between
-						e = ladder_search(e, get_prec_node(&a), a);
+						e = ladder_search(e, c, f);
 						if (e == 0) break;
 						int c = get_next_node(&e);
 						//g b, h and j are temporary for now
@@ -302,92 +372,29 @@ void float5()
 						int j = get_next_node(&b);
 						int h = get_prec_node(&y);
 
-						int d = get_next_node(&j);
+						int d = j;
 						while(not_found){
-								d = ladder_search(d, y, c);
+								d = ladder_search(d, h, c);
 								if (d == 0) break;
 								h = get_next_node(&d);
 								j = get_prec_node(&d);
 
 								int b = g;
 								while(not_found){
-								b = ladder_search(b, j, y);
-								if (b == 0) break;
-								g = get_prec_node(&b);
-								not_found = false;
-								printf("y = %i, x = %i, a = %i, b = %i, c = %i, d = %i \n", y, x, a, b, c, d );
+										b = ladder_search(b, j, y);
+										if (b == 0) break;
+										g = get_prec_node(&b);
+										not_found = false;
+										printf("y = %i, x = %i, e = %i, c = %i, a = %i, f = %i, g = %i, b = %i, j = %i, d = %i, h = %i \n", y, x, e, c, a, f, g, b, j, d, h);
+
+
 								}
 						}
 
-						not_found = false;
 				}
 
 		}
 	} //for
-}
-
-void stage3(int** graph, int* node_count, int* path) 
-{
-
-}
-
-int flo1(int* gap)
-{
-    int x,y,a,b,c,d;
-    int prec_node;
-
-    y = gap[0];
-    x = gap[1];
-
-    for (int i = 0; i < *g_node_count; i++) {
-
-        a = g_path[i];
-        c = get_prec_node(&a);
-
-        // look for a edge between x and a
-        if (g_graph[x][a] == 1) {        
-
-            // from a find an edge b connected to a
-            // or has a path to a and is connected to y
-            // or if the following node d is connected to 
-            // c node
-            prec_node = a;
-            b = get_next_node(&a);
-            while (g_graph[prec_node][b] == 1 && b != y) {
-                
-                d = get_next_node(&b);
-                if (g_graph[b][y] == 1
-                    || g_graph[d][c] ==1) {
-                    swap_nodes(d,y);
-                    swap_nodes(x,c);
-                    return 1;
-                } //if
-
-                // move to next node
-                prec_node = b;
-                b = get_next_node(&b);
-
-            } //while
-        } //if
-        
-    } //for
-
-    return 0;
-}
-
-int flo2(int* gap)
-{
-    return 0;
-}
-
-int flo3(int* gap)
-{
-    return 0;
-}
-
-int flo4(int* gap)
-{
-    return 0;
 }
 
 int flo5(int* gap)
