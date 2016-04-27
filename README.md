@@ -6,6 +6,8 @@ Simply run `make` to build all utilities
 
 ## Utilities
 
+Run any of the programs without any arguments to get more detailed usage instructions.
+
 **hc_check**: Checks that a provided tour is a Hamiltonian Cycle for a provided graph (HCP edge list)
 
 **hc_to_dot**: Converts a Graph in HCP edge list format to a dot format to use with Graphviz
